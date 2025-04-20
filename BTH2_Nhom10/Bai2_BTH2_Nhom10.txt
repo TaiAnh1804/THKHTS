@@ -1,0 +1,32 @@
+----------------------------------------------------------------------------------
+------ Bài 2 của "Bài thực hành 2" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity bai2 is
+    Port (reset,clk,enable: in std_logic;
+          cnt: out std_logic_vector(1 downto 0) );
+end bai2;
+
+architecture Behavioral of bai2 is
+    signal temp : std_logic_vector(1 downto 0);
+begin
+    process(reset,clk,enable)
+    begin
+        if reset = '1' then temp <= "00";
+        else
+            if clk'event and clk = '1' then
+                if enable = '1' then
+                    if temp = "00" then temp <= "01";
+                    elsif temp = "01" then temp <= "11";
+                    elsif temp = "11" then temp <= "10";
+                    elsif temp = "10" then temp <= "00";
+                    end if;
+                end if;
+            end if;
+        end if;
+    end process;
+    cnt <=temp;
+end Behavioral;

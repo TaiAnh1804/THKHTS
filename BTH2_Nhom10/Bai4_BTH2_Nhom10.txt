@@ -1,0 +1,27 @@
+----------------------------------------------------------------------------------
+------ Bài 4 của "Bài thực hành 2" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_unsigned.all;
+entity bai4 is
+  Port (sl: in std_logic_vector(7 downto 0);
+        clk, reset, enable: in std_logic;
+        dout: out std_logic_vector(7 downto 0) );
+end bai4;
+architecture Behavioral of bai4 is
+    signal temp : std_logic_vector(7 downto 0);
+begin
+    process(clk,reset)
+    begin
+        if reset = '1' then temp <= "00000000";
+        else
+            if (clk'event and clk = '1') then 
+                if enable = '1' then temp <= ("0000" & sl(7 downto 4));
+                end if;
+            end if;
+        end if; 
+    end process;
+    dout <= temp;
+end Behavioral;

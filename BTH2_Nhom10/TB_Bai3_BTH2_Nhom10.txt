@@ -1,0 +1,30 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 3 của "Bài thực hành 2" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+entity tb_bai3 is
+end tb_bai3;
+architecture Behavioral of tb_bai3 is
+    component bai3
+    Port (clk_in: in std_logic;
+        clk_out: out std_logic
+       );
+    end component;
+    signal clk_in: std_logic :='1';
+    signal clk_out : std_logic;
+begin
+    uut: bai3 port map(clk_in => clk_in, clk_out => clk_out);
+    create_clk: process
+    begin
+        clk_in <= '0';
+        wait for 5ns;
+        clk_in <= '1';
+        wait for 5ns;
+    end process;
+
+end Behavioral;

@@ -1,0 +1,43 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 2 của "Bài thực hành 2" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity tb_bai2 is
+--  Port ( );
+end tb_bai2;
+architecture Behavioral of tb_bai2 is
+    component bai2
+    Port (reset,clk,enable: in std_logic;
+          cnt: out std_logic_vector(1 downto 0) );
+    end component;
+    signal reset,clk: std_logic ;
+    signal enable: std_logic := '1';
+    signal cnt: std_logic_vector(1 downto 0);
+begin
+    uut: bai2 port map ( reset => reset, clk => clk, enable => enable, cnt=>cnt);
+    create_clk: process
+    begin
+        clk <= '0';
+        wait for 5ns;
+        clk <= '1';
+        wait for 5ns;
+    end process;
+    input_data: process
+    begin
+        RESET <= '1';
+        wait for 20ns;
+        RESET <= '0';
+        wait for 100ns;
+        ENABLE <= '0';
+        wait for 30ns;
+        reset <= '1';
+        wait for 10ns;
+        reset <='0';
+        wait for 15ns;
+        ENABLE <= '1';
+        wait for 100ns;
+        wait;
+    end process;
+end Behavioral;

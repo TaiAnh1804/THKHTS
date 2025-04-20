@@ -1,0 +1,29 @@
+----------------------------------------------------------------------------------
+------ Bài 3 của "Bài thực hành 2" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+entity bai3 is
+  Port (clk_in: in std_logic;
+        clk_out: out std_logic
+       );
+end bai3;
+
+architecture Behavioral of bai3 is
+    signal temp: std_logic := '0';
+    signal count: integer := 1;
+begin
+    process(clk_in)
+    begin
+        if ((clk_in'event and clk_in = '1') or (clk_in'event and clk_in='0')) then 
+            if count = 50 then count <= 1; temp <= not temp;
+                else count <= count +1 ;
+            end if;
+        end if;
+    end process;
+    clk_out <= temp;
+end Behavioral;
