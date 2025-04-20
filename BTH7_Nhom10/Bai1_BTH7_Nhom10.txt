@@ -1,0 +1,226 @@
+----------------------------------------------------------------------------------
+------ Bài 1 của "Bài thực hành 7" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity combine_file is
+    Port ( 
+        Clk100M: in std_logic;
+        reset, en : in std_logic;
+        led: out std_logic_vector (6 downto 0 );
+        CAT: out std_logic
+    );
+end combine_file;
+
+architecture Behavioral of combine_file is
+    
+    component freq_div
+    generic(N: integer);
+    port (
+		Clk100M: in std_logic;
+		rst: in std_logic;
+		Clk1s: out std_logic;
+		en: out std_logic
+	);
+	end component;
+	-- khi muốn test đếm tiến +1 tới 24 thì thay cnt24bcd 
+	-- khi muốn test đếm tiến +2 tới 98 thì thay cntup
+	-- khi muốn test đếm lùi -1         thì thay cntdown
+	component cntup
+	port (
+        clk: in std_logic;
+        en: in std_logic;
+        clr: in std_logic;
+        qh: out std_logic_vector(3 downto 0);
+        ql: out std_logic_vector(3 downto 0)
+    );
+    end component;
+    
+    component mux_2
+    port (
+		A: in std_logic_vector ( 3 downto 0 );
+		B: in std_logic_vector ( 3 downto 0 );
+		sel: in std_logic;
+		Y: out std_logic_vector( 3 downto 0 )
+	);
+	end component;
+	
+	component led_seg
+	 Port ( 
+        NBCD: in std_logic_vector( 3 downto 0 );
+        led: out std_logic_vector( 6 downto 0 )
+    );
+    end component;
+    
+    signal clock, sele: std_logic;
+    signal led_1, led_2: std_logic_vector( 3 downto 0 );
+    signal mux_out: std_logic_vector( 3 downto 0 );
+    
+    signal tmp1, tmp2: std_logic;
+
+    begin
+        A0: freq_div 
+        generic map(1e4)
+        port map(Clk100M => Clk100M, rst => reset, Clk1s => sele, en => tmp1 );
+        A1: freq_div 
+        generic map(1e8)
+        port map(Clk100M => Clk100M, rst => reset, en => clock, Clk1s => tmp2);
+        A2: cntup port map(clk => clock, en => en, clr => reset, qh => led_1, ql => led_2);
+        A3: mux_2 port map(A => led_2, B => led_1, sel => sele, Y => mux_out);
+        A4: led_seg port map(NBCD => mux_out, led => led);
+        --Clk1s <= clock;
+        CAT <= sele;
+    end behavioral;
+
+
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity freq_div is 
+generic ( N: integer );
+	port (
+		Clk100M: in std_logic;
+		rst: in std_logic;
+		Clk1s: out std_logic;
+		en: out std_logic
+	);	
+end freq_div;
+
+architecture Behavioral of freq_div is
+	signal tmp,e: std_logic := '0';
+begin
+process
+    variable count: integer range 1 to N/2:= 1;
+begin
+	WAIT UNTIL RISING_EDGE ( Clk100M );
+	if ( rst = '0' ) then 
+		count := 1;
+		tmp <= '0';
+		e <= '0';
+	else
+		if ( count = N/2) then 
+			tmp <= not tmp;
+			e <= '1' and tmp;
+			count := 1;
+		else 
+			count := count + 1;
+			e <= '0';
+		end if;
+	end if;
+end process;
+        Clk1s <= tmp ;
+	    en <= e;
+end Behavioral;
+
+
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity mux_2 is
+	port (
+		A: in std_logic_vector ( 3 downto 0 );
+		B: in std_logic_vector ( 3 downto 0 );
+		sel: in std_logic;
+		Y: out std_logic_vector( 3 downto 0 )
+	);
+end mux_2;
+
+architecture Behavioral of mux_2 is
+	begin
+		with sel select 
+			Y <= A when '0',
+			B when others;
+end Behavioral;
+
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity led_seg is
+    Port ( 
+        NBCD: in std_logic_vector( 3 downto 0 );
+        led: out std_logic_vector( 6 downto 0 )
+    );
+end led_seg;
+
+architecture Behavioral of led_seg is
+begin
+    process(NBCD)
+    begin
+        case NBCD is
+            when "0000" => led <= "1111110";
+            when "0001" => led <= "0110000";
+            when "0010" => led <= "1101101";
+            when "0011" => led <= "1111001";
+            when "0100" => led <= "0110011";
+            when "0101" => led <= "1011011";
+            when "0110" => led <= "1011111";
+            when "0111" => led <= "1110000";
+            when "1000" => led <= "1111111";
+            when "1001" => led <= "1111011";
+            when others => led <= "1111110";
+        end case; 
+    end process;
+end Behavioral;
+
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+entity cntup2 is
+    port (
+        clk: in std_logic;
+        en: in std_logic;
+        clr: in std_logic;
+        qh: out std_logic_vector(3 downto 0);
+        ql: out std_logic_vector(3 downto 0)
+    );
+end cntup2;
+
+architecture one of cntup2 is
+    signal temp: std_logic_vector(7 downto 0) := "00000000";  
+begin
+    --cout <= '1' when (temp = x"24" and en = '1') else '0';
+    --cout <= '1' when ((temp( 3 downto 0 ) = 1) and (temp(7 downto 4) >= 1)) else '0';
+    
+    process (clk, clr)
+    begin
+        if (clr = '0') then
+            temp <= "00000000";
+        elsif (clk'event and clk = '1') then
+
+            if en = '1' then
+                if     temp = x"98"     then                    -- Reset khi x = 98
+                       temp <= (others=> '0');
+                elsif  temp(3 downto 0) = "1000"    then        --hàng đơn vị = 8
+                       temp(3 downto 0) <= (others => '0');
+                       if  temp(7 downto 4) = "1001"   then     --hàng chục = 9x
+                           temp(7 downto 4) <= (others => '0');
+                       else    temp(7 downto 4) <= temp(7 downto 4) + 1;
+                       end if;
+                else   temp(3 downto 0) <= temp(3 downto 0) + 1 + 1;
+                end if;
+            end if;
+        end if;
+    end process;
+    
+    qh <= temp(7 downto 4);
+    ql <= temp(3 downto 0);
+end one;
