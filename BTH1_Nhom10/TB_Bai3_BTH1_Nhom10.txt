@@ -1,0 +1,31 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 3 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity tb_number_bit1 is
+--  Port ( );
+end tb_number_bit1;
+
+architecture Behavioral of tb_number_bit1 is
+    signal A: std_logic_vector ( 7 downto 0 );
+    signal B: std_logic_vector ( 3 downto 0 );
+begin
+    uut: entity work.number_bit1
+    port map (
+        A => A,
+        B => B
+            );
+    stim_proc: process
+        begin
+            A <= "01101011";
+            wait for 5 ns;
+            A <= "11111111";
+            wait for 5 ns;
+            A <= "10101111";
+            wait;
+        end process;
+end Behavioral;

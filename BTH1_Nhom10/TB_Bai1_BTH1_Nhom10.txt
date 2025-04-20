@@ -1,0 +1,39 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 1 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity tb_bai1 is
+--  Port ( );
+end tb_bai1;
+
+architecture Behavioral of tb_bai1 is
+    component bai1
+    Port (a,b: in std_logic_vector(7 downto 0);
+        cin: in std_logic;
+        cout: out std_logic;
+        sum: out std_logic_vector(7 downto 0) );
+    end component;
+    signal a,b: std_logic_vector(7 downto 0) := (others => '0');
+    signal cin: std_logic := '0';
+    signal cout: std_logic;
+    signal sum: std_logic_vector(7 downto 0);
+begin
+    utt: bai1 port map(a=>a,b=>b,cin=>cin,cout=>cout,sum=>sum);
+    process
+    begin
+        wait for 10ns;
+        a <= "10101101";        b <= "11011001";        cin <= '1';
+        
+        wait for 10ns;
+        a <= "10101100";        b <= "10011001";        cin <= '0';
+        
+        wait for 10ns;
+        a <= "10100001";        b <= "01011001";        cin <= '1';
+        
+        wait;
+    end process;
+end Behavioral;

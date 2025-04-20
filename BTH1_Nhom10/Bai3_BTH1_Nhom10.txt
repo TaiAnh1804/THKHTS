@@ -1,0 +1,33 @@
+----------------------------------------------------------------------------------
+------ Bài 3 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.ALL;
+use IEEE.std_logic_unsigned.ALL;
+
+entity number_bit1 is
+    Port ( 
+        A: in std_logic_vector( 7 downto 0 );
+        B: out std_logic_vector( 3 downto 0 ) 
+    );
+end number_bit1;
+
+architecture Behavioral of number_bit1 is
+begin
+process( A )
+    variable temp: std_logic_vector ( 3 downto 0 ) := "0000";
+    variable i: integer := 0;
+begin
+    temp := "0000";
+    for i in 0 to 7 loop
+        if( A(i) =  '1' ) then
+            temp := temp + 1;
+        end if;
+    end loop;
+ 	B <= temp;
+
+end process;
+end Behavioral;

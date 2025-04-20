@@ -1,0 +1,47 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 5 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
+use IEEE.NUMERIC_STD.ALL;
+
+
+entity tb_bai5 is
+--  Port ( );
+end tb_bai5;
+
+architecture Behavioral of tb_bai5 is
+    component bai5
+        Port (a,b: in std_logic_vector(3 downto 0) ;
+        sub,cin: in std_logic ;
+        cout: out std_logic;
+        sum: out std_logic_vector(3 downto 0)
+        );
+    end component;
+    
+    signal a,b:  std_logic_vector(3 downto 0) := "0000";
+    signal sub,cin:  std_logic := '0';
+    signal cout:  std_logic;
+    signal sum:  std_logic_vector(3 downto 0);
+begin
+    uut: bai5 port map ( a=> a, b=>b, sub => sub, cin=>cin, cout=>cout, sum=>sum);
+    process
+    begin
+        wait for 10ns;
+        
+        a <= "0001"; b <= "0000" ; sub <= '1' ; cin <= '1'; wait for 20ns;
+        a <= "0101"; b <= "1001" ; sub <= '0' ; cin <= '1'; wait for 20ns;
+        a <= "1001"; b <= "0000" ; sub <= '1' ; cin <= '0'; wait for 20ns;
+        a <= "0111"; b <= "0101" ; sub <= '0' ; cin <= '0'; wait for 20ns;
+        a <= "0011"; b <= "0011" ; sub <= '1' ; cin <= '1'; wait for 20ns;
+        a <= "1001"; b <= "1001" ; sub <= '0' ; cin <= '1'; wait for 20ns;
+        
+        wait;
+        
+    end process;
+    
+end Behavioral;

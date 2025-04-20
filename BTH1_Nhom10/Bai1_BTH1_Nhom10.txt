@@ -1,0 +1,30 @@
+----------------------------------------------------------------------------------
+------ Bài 1 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity bai1 is
+  Port (a,b: in std_logic_vector(7 downto 0);
+        cin: in std_logic;
+        cout: out std_logic;
+        sum: out std_logic_vector(7 downto 0) );
+end bai1;
+
+architecture Behavioral of bai1 is
+    component FA4bit
+    port(a,b: in std_logic_vector(3 downto 0);
+        cin: in std_logic;
+        cout: out std_logic;
+        sum: out std_logic_vector(3 downto 0) );
+     end component;
+     signal sum1,sum2: std_logic_vector(3 downto 0);
+     signal cout1: std_logic;
+begin
+    FA4bit_1: FA4bit port map (a=>a(3 downto 0),b=>b(3 downto 0),cin =>cin,cout=>cout1,sum=>sum1);
+    FA4bit_2: FA4bit port map (a=>a(7 downto 4),b=>b(7 downto 4),cin =>cout1,cout=>cout,sum=>sum2);
+    sum<=sum2&sum1;
+
+end Behavioral;

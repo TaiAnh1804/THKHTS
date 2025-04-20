@@ -1,0 +1,67 @@
+----------------------------------------------------------------------------------
+------ Bài 5 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
+use IEEE.NUMERIC_STD.ALL;
+
+entity bai5 is
+  Port (a,b: in std_logic_vector(3 downto 0) ;
+        sub,cin: in std_logic ;
+        cout: out std_logic;
+        sum: out std_logic_vector(3 downto 0)
+        );
+end bai5;
+
+architecture Behavioral of bai5 is
+    component FA    
+    Port(a,b : in std_logic_vector(3 downto 0);
+        cin: in std_logic;
+        cout: out std_logic;
+        sum: out std_logic_vector(3 downto 0));
+    end component;
+    
+    signal congor: std_logic;
+    signal chonb: std_logic_vector(3 downto 0);
+begin
+    process(sub,chonb)
+    begin
+        if sub <= '0' then chonb <= b;
+        else chonb <= not b;
+        end if;
+    end process;
+    congor <= sub or cin;
+    CONG: FA port map (a=>a,b=>chonb,cin=>congor,sum=>sum,cout=>cout) ;
+end Behavioral;
+
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_unsigned.all;
+use ieee.std_logic_arith.all;
+use IEEE.NUMERIC_STD.ALL;
+
+entity FA is
+    Port(a,b : in std_logic_vector(3 downto 0);
+        cin: in std_logic;
+        cout: out std_logic;
+        sum: out std_logic_vector(3 downto 0));
+end FA;
+
+architecture Behavioral of FA is
+    signal tempa: std_logic_vector(4 downto 0);  
+    signal tempb: std_logic_vector(4 downto 0); 
+    signal temps: std_logic_vector(4 downto 0);   
+begin
+    tempa <= '0' & a ;
+    tempb <= '0' & b ;
+    temps <= tempa + tempb + cin;
+    sum <= temps(3 downto 0);
+    cout <= temps(4);
+end Behavioral;
+

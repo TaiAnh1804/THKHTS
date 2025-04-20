@@ -1,0 +1,27 @@
+----------------------------------------------------------------------------------
+------ Bài 4 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.std_logic_unsigned.all;
+
+
+entity bai4 is
+  Port (a, b: in std_logic_vector(3 downto 0);
+        y: out std_logic_vector(7 downto 0));
+end bai4;
+
+architecture Behavioral of bai4 is
+
+begin
+    process(a,b)
+        variable temp: std_logic_vector(4 downto 0);
+    begin
+        temp := ('0'&a) + b ;
+        if temp > "01001" then temp := temp + 6;
+        end if;
+        y <= "000"&temp;
+    end process;    
+end Behavioral;

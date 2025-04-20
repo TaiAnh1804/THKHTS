@@ -1,0 +1,30 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 2 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity tb_thermometer is
+--  Port ( );
+end tb_thermometer;
+
+architecture Behavioral of tb_thermometer is
+    signal X: std_logic_vector( 2 downto 0 );
+    signal Y: std_logic_vector ( 7 downto 0 );
+begin
+    uut: entity work.thermo_meter
+    port map(
+        X => X,
+        Y => Y
+        );
+    stim_proc:process
+    begin
+        X <= "111";
+        wait for 5 ns;
+        X <= "010";
+        wait for 5 ns;
+    end process;
+end Behavioral;

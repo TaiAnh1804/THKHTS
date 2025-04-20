@@ -1,0 +1,30 @@
+----------------------------------------------------------------------------------
+------ Bài 2 của "Bài thực hành 1" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity thermo_meter is
+    Port (
+        X: in std_logic_vector ( 2 downto 0 );
+        Y: out std_logic_vector ( 7 downto 0 )
+     );
+end thermo_meter;
+
+architecture Behavioral of thermo_meter is
+begin
+process( X )
+    variable i, temp1: integer ;
+    variable temp2: std_logic_vector( 7 downto 0 );
+begin 
+    temp2 := (others => '0');
+    temp1 := to_integer(unsigned(X));
+    for i in 0 to (temp1 - 1) loop
+        temp2(i) := '1';
+    end loop;
+        Y <= temp2;
+end process;
+end Behavioral;
