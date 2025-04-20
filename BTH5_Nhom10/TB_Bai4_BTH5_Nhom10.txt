@@ -1,0 +1,65 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 4 của "Bài thực hành 5" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity tb_bai4 is
+--  Port ( );
+end tb_bai4;
+
+architecture Behavioral of tb_bai4 is
+    component bai4
+    Port (sw_tich: in std_logic_vector(7 downto 0); --a(7-4) b(3-0)
+          sw_tong: in std_logic_vector(7 downto 0); --c
+          led: out std_logic_vector(8 downto 0) );  --led(8) cờ, còn lại là kết quả
+    end component;
+    
+    signal sw_tich, sw_tong: std_logic_vector(7 downto 0);
+    signal led: std_logic_vector(8 downto 0);
+begin
+    uut : bai4 port map (sw_tich=>sw_tich, sw_tong=>sw_tong, led => led);
+    process
+    begin
+        wait for 10ns;
+        sw_tich <= "00000101";  -- BCD: 05
+        sw_tong <= "00001010";  -- Thập phân: 10
+        wait for 10 ns;
+        
+        sw_tich <= "00100011";  -- BCD: 23
+        sw_tong <= "00111100";  -- Thập phân: 60
+        wait for 10 ns;
+        
+        sw_tich <= "01000111";  -- BCD: 47
+        sw_tong <= "01011011";  -- Thập phân: 91
+        wait for 10 ns;
+        
+        sw_tich <= "01101001";  -- BCD: 69
+        sw_tong <= "10101010";  -- Thập phân: 170
+        wait for 10 ns;
+        
+        sw_tich <= "00011000";  -- BCD: 18
+        sw_tong <= "00011111";  -- Thập phân: 31
+        wait for 10 ns;
+        
+        sw_tich <= "10010000";  -- BCD: 90
+        sw_tong <= "11110000";  -- Thập phân: 240
+        wait for 10 ns;
+        
+        sw_tich <= "00110110";  -- BCD: 36
+        sw_tong <= "01001100";  -- Thập phân: 76
+        wait for 10 ns;
+        
+        sw_tich <= "01000001";  -- BCD: 41
+        sw_tong <= "01100101";  -- Thập phân: 101
+        wait for 10 ns;
+        
+        sw_tich <= "01110010";  -- BCD: 72
+        sw_tong <= "10011111";  -- Thập phân: 159
+        wait for 10 ns;
+        
+        sw_tich <= "00000000";  -- BCD: 00
+        sw_tong <= "11111111";  -- Thập phân: 255
+        wait;
+    end process;
+end Behavioral;

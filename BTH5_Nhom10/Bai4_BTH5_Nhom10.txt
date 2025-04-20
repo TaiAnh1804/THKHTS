@@ -1,0 +1,25 @@
+----------------------------------------------------------------------------------
+------ Bài 4 của "Bài thực hành 5" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_unsigned.all;
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+use IEEE.NUMERIC_STD.ALL;
+entity bai4 is
+    Port (sw_tich: in std_logic_vector(7 downto 0); --a(7-4) b(3-0)
+          sw_tong: in std_logic_vector(7 downto 0); --c
+          led: out std_logic_vector(8 downto 0) );  --led(8) cờ, còn lại là kết quả
+end bai4;
+architecture Behavioral of bai4 is
+    component bai3
+    Port (sw: in std_logic_vector(7 downto 0);
+          led: out std_logic_vector(7 downto 0) );
+    end component;
+    signal temp_tich: std_logic_vector(7 downto 0);
+begin
+    tich: bai3 port map(sw=>sw_tich, led => temp_tich);
+    led <= ('0'&temp_tich) + ('0'&sw_tong);
+end Behavioral;

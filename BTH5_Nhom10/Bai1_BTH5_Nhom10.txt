@@ -1,0 +1,25 @@
+----------------------------------------------------------------------------------
+------ Bài 1 của "Bài thực hành 5" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_arith.all;
+entity bai1 is
+    Port (sw : in std_logic_vector(2 downto 0);
+          led: out std_logic_vector(1 downto 0) );
+--  ý tưởng bài này là cho 
+--    sw(0) là vay vào
+--    sw(1) là số trừ
+--    sw(2) là số bị trừ
+--    led(0) là vay ra
+--    led(1) là kết quả
+end bai1;
+architecture Behavioral of bai1 is
+begin
+        -- kết quả hiệu
+        led(1) <= sw(0) xor sw(1) xor sw(2);
+        -- kết quả vay ra
+        led(0) <= ((not sw(2)) and sw(1)) or ((not sw(2)) and sw(0)) or (sw(1) and sw(0));
+
+end Behavioral;

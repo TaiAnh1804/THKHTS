@@ -1,0 +1,27 @@
+----------------------------------------------------------------------------------
+------ Bài 3 của "Bài thực hành 5" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+
+entity bai3 is
+    Port (sw: in std_logic_vector(7 downto 0);
+          led: out std_logic_vector(7 downto 0) );
+-- sw(7-4) là a
+--sw(3-0) là b
+      
+end bai3;
+
+architecture Behavioral of bai3 is
+    signal temp0,temp1,temp2,temp3: std_logic_vector(7 downto 0);
+begin
+    temp0 <= ("0000"& sw(7 downto 4)) when sw(0) = '1' else (others => '0'); --a x b(0)
+    temp1 <= ("000"& sw(7 downto 4) & '0') when sw(1) = '1' else (others => '0');
+    temp2 <= ("00"& sw(7 downto 4) & "00") when sw(2) = '1' else (others => '0');
+    temp3 <= ('0'& sw(7 downto 4) & "000") when sw(3) = '1' else (others => '0');
+    
+    led <= temp0+temp1+temp2+temp3;
+end Behavioral;

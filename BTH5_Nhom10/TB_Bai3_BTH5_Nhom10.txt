@@ -1,0 +1,46 @@
+----------------------------------------------------------------------------------
+------ TB_Bài 3 của "Bài thực hành 5" - Nhóm 10: Hiếu, Duy, Khiêm, Tài -----------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+entity tb_bai3 is
+--  Port ( );
+end tb_bai3;
+
+architecture Behavioral of tb_bai3 is
+    component bai3
+        Port (sw: in std_logic_vector(7 downto 0);
+          led: out std_logic_vector(7 downto 0) );
+    end component;
+    
+    signal sw : std_logic_vector(7 downto 0) := (others=>'0');
+    signal led: std_logic_vector(7 downto 0);
+begin
+    uut: bai3 port map( sw=>sw, led=>led);
+    process
+    begin
+        wait for 10ns;
+        sw <= "00000101";  -- 05 (0 hàng chục, 5 đơn vị)
+        wait for 10 ns;
+        sw <= "00100011";  -- 23 (2 hàng chục, 3 đơn vị)
+        wait for 10 ns;
+        sw <= "01000111";  -- 47 (4 hàng chục, 7 đơn vị)
+        wait for 10 ns;
+        sw <= "01101001";  -- 69 (6 hàng chục, 9 đơn vị)
+        wait for 10 ns;
+        sw <= "00011000";  -- 18 (1 hàng chục, 8 đơn vị)
+        wait for 10 ns;
+        sw <= "10010000";  -- 90 (9 hàng chục, 0 đơn vị)
+        wait for 10 ns;
+        sw <= "00110110";  -- 36 (3 hàng chục, 6 đơn vị)
+        wait for 10 ns;
+        sw <= "01000001";  -- 41 (4 hàng chục, 1 đơn vị)
+        wait for 10 ns;
+        sw <= "01110010";  -- 72 (7 hàng chục, 2 đơn vị)
+        wait for 10 ns;
+        sw <= "00000000";  -- 00 (0 hàng chục, 0 đơn vị)
+        wait;
+    end process;
+
+end Behavioral;

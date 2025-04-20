@@ -1,0 +1,41 @@
+----------------------------------------------------------------------------------
+------ Bài 2 của "Bài thực hành 5" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+
+entity bai2 is
+  Port (clk: in std_logic;          -- clk1Hz clk1s
+        clk1s,enable: out std_logic
+         );
+end bai2;
+
+architecture Behavioral of bai2 is
+    signal cnt: integer range 0 to 49999999 := 0; --chia tần số từ 100Hz về 1Hz -> đầu vào 1 chu kì clk = 0,01s = 10.000.000 ns
+    signal temp1: std_logic := '0';
+    signal temp2: std_logic := '0';
+    
+    signal temp3: std_logic := '0';
+    component count4bit
+    Port (clk, reset: in std_logic;
+        q: out std_logic_vector(3 downto 0)
+         );
+    end component;
+begin
+    process(clk)
+    begin
+        if clk'event and clk = '1' then 
+            if cnt = 49999999 then cnt <= 0; temp1 <= not temp1; temp2 <= '1' and temp1;
+            else cnt <= cnt + 1; temp2 <= '0';
+            end if;
+            
+        end if;
+        clk1s <= temp1;
+        enable <= temp2;
+    end process;
+end Behavioral;
