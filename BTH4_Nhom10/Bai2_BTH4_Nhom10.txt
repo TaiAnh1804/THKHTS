@@ -1,0 +1,73 @@
+----------------------------------------------------------------------------------
+------ Bài 2 của "Bài thực hành 4" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+use STD.TEXTIO.ALL;
+use STD.ENV.ALL;
+use ieee.std_logic_unsigned.all;
+
+entity tbb4 is
+--  Port ( );
+end tbb4;
+
+architecture Behavioral of tbb4 is
+    component bai4
+        generic (N:integer:= 4);
+        Port    (a,b:in std_logic_vector(2*N-1 downto 0);
+                clk,rs,load,cin:in std_logic;
+                sum:out std_logic_vector(2*N-1 downto 0);
+                cout,valid:out std_logic
+                );
+    end component;
+    
+    constant n:integer :=4;
+    signal a,b:std_logic_vector(2*n-1 downto 0); 
+    signal clk,rs,load,cin:std_logic;
+    signal sum:std_logic_vector(2*n-1 downto 0);
+    signal cout,valid:std_logic;  
+begin
+    duut: bai4
+        generic map(N=>n)
+        port map(
+            a=>a,
+            b=>b,
+            clk=>clk,
+            rs=>rs,
+            load=>load,
+            cin=>cin,
+            sum=>sum,
+            cout=>cout,
+            valid=>valid
+            );
+    clk_proc:process
+    begin
+        clk<='0'; wait for 10ns;
+        clk<='1'; wait for 10ns;
+    end process;
+    stim_pro:process
+        file log_file : text open WRITE_MODE is "mach cong.txt";
+        variable log_line : line;
+    begin
+        rs <= '1';      wait for 20ns;
+        rs <= '0';        a <= "00010001";          b <= "00010010";          cin <= '0';
+        Load <= '1';    wait for 20ns;
+        Load <= '0';
+        wait until valid ='1';
+            write(log_line, string'("test : a=17, b=18, cin=0"));
+            writeline(log_file, log_line);       
+            write(log_line, string'("  ket qua: Sum="));
+            write(log_line, integer'image(to_integer(unsigned(Sum))));
+            write(log_line, string'(", cout="));
+            if cout = '0' then
+              write(log_line, string'("0"));
+            else
+              write(log_line, string'("1"));
+            end if;
+            writeline(log_file, log_line);       
+            wait;
+    end process;
+end Behavioral;
