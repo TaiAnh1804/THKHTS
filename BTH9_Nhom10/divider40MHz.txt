@@ -1,0 +1,64 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 03/27/2025 11:54:54 PM
+-- Design Name: 
+-- Module Name: freq_div - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity freq_div is
+    generic ( N: natural := 4 * 1e7 );
+    Port (
+        CLk100M, rst: in std_logic;
+        en, Clk40M: out std_logic
+     );
+end freq_div;
+
+architecture Behavioral of freq_div is
+begin
+    process
+        variable tmp: std_logic := '0';
+        variable count: natural range 1 to N/2 := 0;
+    begin
+        WAIT UNTIL RISING_EDGE( Clk100M );
+        if( rst = '1' ) then
+            count := 1;
+            tmp := '0';
+        else
+            if( count = N /2 ) then
+                tmp := not tmp;
+                en <= tmp and '1';
+                count := 1;
+            else 
+                count := count + 1;
+                en <= '0';
+            end if;
+        end if;
+        Clk40M <= tmp;
+    end process;
+end Behavioral;

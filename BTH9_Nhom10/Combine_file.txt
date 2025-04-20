@@ -1,0 +1,65 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 04/16/2025 10:47:44 AM
+-- Design Name: 
+-- Module Name: VGA_combine - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity VGA_combine is
+    Port (
+        Clk100M: in std_logic;
+        reset: in std_logic;
+        HSync, VSync: out std_logic;
+        RGB: out std_logic_vector(2 downto 0)
+     );
+end VGA_combine;
+
+architecture Behavioral of VGA_combine is
+    signal tmp_clk1s : std_logic;
+    signal clock: std_logic;
+begin
+    A0: entity work.freq_div
+    port map(
+        Clk100M => Clk100M,
+        rst => reset,
+        en => clock,
+        Clk40M => tmp_clk1s
+    );
+    
+    A1: entity work.VGA_driver
+    port map(
+        Clk40M => clock,
+        rst => reset,
+        HSync => HSYnc,
+        VSync => VSync,
+        RGB => RGB
+    );
+
+
+end Behavioral;

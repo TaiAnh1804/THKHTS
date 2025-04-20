@@ -1,0 +1,157 @@
+----------------------------------------------------------------------------------
+-- Company: 
+-- Engineer: 
+-- 
+-- Create Date: 03/28/2025 12:13:32 AM
+-- Design Name: 
+-- Module Name: VGA_driver - Behavioral
+-- Project Name: 
+-- Target Devices: 
+-- Tool Versions: 
+-- Description: 
+-- 
+-- Dependencies: 
+-- 
+-- Revision:
+-- Revision 0.01 - File Created
+-- Additional Comments:
+-- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+--use IEEE.std_logic_unsigned.ALL;
+use IEEE.numeric_std.ALL;
+--use IEEE.STD_LOGIC_ARITH.ALL;
+library work;
+use work.parameter_VGA.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+library UNISIM;
+use UNISIM.VComponents.all;
+
+entity VGA_driver is
+    Port ( 
+        Clk40M, rst: in std_logic;
+        HSync, VSync: out std_logic;
+        RGB : out std_logic_vector ( 2 downto 0 );
+        pixel_x, pixel_y: out std_logic_vector(9 downto 0)
+    );
+end VGA_driver;
+
+architecture Behavioral of VGA_driver is
+    signal h_pos, v_pos : integer := 0;
+    signal display: std_logic;
+begin
+    
+
+    Scanner_Horizon: process( Clk40M, rst)
+    begin
+        if( rst = '0') then
+            h_pos <=0;
+        elsif( rising_edge(Clk40m) )then
+            if( h_pos = HFP + HVA + HBP + HSP ) then
+                h_pos <= 0;
+            else 
+                h_pos <= h_pos + 1;
+            end if;
+        end if;
+    end process;
+    
+    Scanner_Vertical: process( CLk40M, h_pos, rst )
+    begin
+        if( rst = '0' ) then 
+            v_pos <= 0;
+        elsif( rising_edge (Clk40M)) then
+            if( h_pos = HFP + HVA + HBP + HSP ) then
+                if( v_pos = VFP + VVA + VBP + VSP ) then
+                    v_pos <= 0;
+                else 
+                    v_pos <= v_pos + 1;
+                end if;
+            end if;
+        end if;
+    end process;
+    
+    Horizontal_Synchronous: process( Clk40M, h_pos, rst )
+    begin
+        if( rst = '0' ) then
+            HSync <= '0';
+        elsif( rising_edge(Clk40M)) then
+            if( h_pos <= ( HVA + HFP ) or h_pos >= ( HVA + HFP + HSP ) ) then
+                HSync <= '1';
+            else 
+                HSync <= '0';
+            end if;
+        end if;
+    end process;
+    
+    Vertical_SynchronousL: process( Clk40M, rst, v_pos )
+    begin
+        if( rst = '0' ) then
+            VSync <= '0';
+        elsif( rising_edge(Clk40M)) then
+            if( v_pos <= ( VVA + VFP ) or v_pos >= ( VVA + VFP + VSP ) ) then
+                VSync <= '1';
+            else 
+                VSync <= '0';
+            end if;
+        end if;
+    end process;
+    
+    Horizontal_enable: process( Clk40M, h_pos, v_pos )
+    begin
+        if(rising_edge(Clk40M)) then
+            if(h_pos < HVA and v_pos < VVA) then
+                pixel_x <= std_logic_vector(to_unsigned(h_pos, 10));
+                pixel_y <= std_logic_vector(to_unsigned(v_pos, 10));
+            end if;
+        end if;
+    end process;
+    
+    set_display: process(Clk40M, rst, h_pos, v_pos)
+    begin
+        if(rst = '0') then
+            display <= '0';
+        else
+            if(rising_edge(Clk40M)) then
+                if(h_pos < HVA and v_pos < VVA) then
+                    display <= '1';
+                else 
+                    display <= '0';
+                end if;
+            end if;
+        end if;
+        end process;
+    
+--    set_RGB: process(Clk40M, rst, h_pos, v_pos, display )
+--    begin
+--        if(rst = '0') then
+--            RGB <= "000";
+--        else
+--            if(rising_edge(Clk40M)) then
+--                if(display = '1')then
+--                    if( v_pos >= 0 and v_pos <= 165 ) then
+--                        RGB <= "100";
+--                    end if;
+--                    if( v_pos <= 230 ) and ( v_pos > 165 ) then
+--                        RGB <= "010";
+--                    end if;
+--                    if( v_pos <= 799 ) and ( v_pos > 230 ) then
+--                        RGB <= "001";
+--                    end if;
+--                else
+--                    RGB <= "000";
+--                end if;
+--            end if;
+--        end if;
+
+--    end process;
+    
+end Behavioral;

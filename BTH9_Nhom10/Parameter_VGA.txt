@@ -1,0 +1,38 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+--use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+package parameter_VGA is
+
+-- VGA 800x600 Resolution - 60Hz Timing
+
+--General Timing 
+    -- Screen Refresh Rate : 60Hz ( 60 frame / s )
+    -- Vertical refresh 37.(87) kHz
+    -- Pixel Requency 40 MHZ
+
+-- Horizontal Timing    - time = Pixels x ( 1 / Pixel Frequency )
+    constant HVA: natural:= 800;    -- Visible Area
+    constant HFP: natural:= 40;     -- Front Porch 
+    constant HSP: natural:= 128;    -- Sync Pulse
+    constant HBP: natural:= 88;     -- Back Porch
+-- Whole Line: 1056 pixels ( Htime = 26.4 us )
+
+
+-- Vertical Timing      - time = Lines x ( 1 / Htime )
+    constant VVA: natural:= 600;    -- Visible Area
+    constant VFP: natural:= 1;      -- Front Porch
+    constant VSP: natural:= 4;      -- Sync Pulse
+    constant VBP: natural:= 23;     -- Back Porch
+-- Whole Frame: 628 Lines ( Vtime = 16.5792 ms )
+end package;
+package body parameter_VGA is
+end parameter_VGA;
