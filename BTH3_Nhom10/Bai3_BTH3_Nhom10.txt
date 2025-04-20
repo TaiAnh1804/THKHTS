@@ -1,0 +1,27 @@
+----------------------------------------------------------------------------------
+------ Bài 3 của "Bài thực hành 3" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+use IEEE.NUMERIC_STD.ALL;
+entity bai3 is
+    generic(N:integer);
+  Port (i_vector: in std_logic_vector(2**N-1 downto 0);
+        o_vector: out std_logic_vector(N downto 0) );
+end bai3;
+architecture Behavioral of bai3 is
+begin
+    process(i_vector)
+    variable temp : std_logic_vector (N downto 0) ;
+    begin
+        temp := (others=>'0');
+        for i in 0 to 2**N-1 loop
+            if (i_vector(i) = '1') then temp := temp + 1;
+            end if;
+        end loop;
+            o_vector <= temp;
+    end process;
+end Behavioral;
