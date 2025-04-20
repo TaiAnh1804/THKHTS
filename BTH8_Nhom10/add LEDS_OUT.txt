@@ -1,0 +1,150 @@
+----------------------------------------------------------------------------------
+--------------------- LEDS_OUT \ divider \ mux_2 \ segment_15 --------------------
+----------------------------------------------------------------------------------
+
+
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity LEDS_OUT is
+    Port ( 
+        A: in std_logic_vector(3 downto 0);
+        B: in std_logic_vector(3 downto 0);
+        Clk100M: in std_logic;
+        reset: in std_logic;
+        led: out std_logic_vector(6 downto 0);
+        CAT: out std_logic
+    );
+end LEDS_OUT;
+
+architecture Behavioral of LEDS_OUT is
+    signal clock: std_logic;
+    signal choose: std_logic;
+    signal mux_out: std_logic_vector(3 downto 0);
+begin
+    A0:entity work.divider
+    generic map(N => 1e6)
+    port map(
+        Clk100M => Clk100M,
+        rst => reset,
+        Clk1s => choose
+    );
+    
+    A1:entity work.mux_2
+    port map(
+        A => A,
+        B => B,
+        sel => choose,
+        Y => mux_out
+    );
+    
+    A2:entity work.segment_15
+    port map(
+        data_in => mux_out,
+        data_out => led
+    );
+    
+    CAT <= choose;
+end Behavioral;
+
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity divider is
+    generic(N: integer);
+    Port ( 
+        Clk100M, rst: in std_logic;
+        Clk1s: out std_logic
+    );
+end divider;
+
+architecture Behavioral of divider is
+    signal tmp: std_logic := '0';
+    signal counter: integer range 1 to N/2 := 1;
+begin
+    process(Clk100M, rst)
+    begin
+        if(rst = '0') then
+            counter <= 1;
+            tmp <= '0';
+        else
+            if(rising_edge(Clk100M)) then
+                if(counter = N/2) then
+                    tmp <= not tmp;
+                    counter <= 1;
+                else 
+                    counter <= counter + 1;
+                end if;
+            end if;
+        end if;
+    end process;
+      Clk1s <= tmp;
+end Behavioral;
+
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity mux_2 is
+    Port (
+        A, B: in std_logic_vector( 3 downto 0 );
+        sel: in std_logic;
+        Y: out std_logic_vector(3 downto 0)
+     );
+end mux_2;
+
+architecture Behavioral of mux_2 is
+begin
+    with sel select
+        Y <= A when '0',
+            B when others;
+end Behavioral;
+
+
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity segment_15 is
+    Port (
+        data_in: in std_logic_vector (3 downto 0 );
+        data_out: out std_logic_vector (6 downto 0)
+     );
+end segment_15;
+
+architecture Behavioral of segment_15 is
+begin
+    process(data_in)
+    begin
+        case data_in is
+            when "0000" => data_out <= "1111110";
+            when "0001" => data_out <= "0110000";
+            when "0010" => data_out <= "1101101";
+            when "0011" => data_out <= "1111001";
+            when "0100" => data_out <= "0110011";
+            when "0101" => data_out <= "1011011";
+            when "0110" => data_out <= "1011111";
+            when "0111" => data_out <= "1110000";
+            when "1000" => data_out <= "1111111";
+            when "1001" => data_out <= "1111011";
+            when "1010" => data_out <= "1110111";
+            when "1011" => data_out <= "0011111";
+            when "1100" => data_out <= "1001110";
+            when "1101" => data_out <= "0111101";
+            when "1110" => data_out <= "1001111";
+            when others => data_out <= "1000111";
+        end case;
+    end process;
+end Behavioral;
+

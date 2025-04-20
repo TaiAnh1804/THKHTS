@@ -1,0 +1,274 @@
+----------------------------------------------------------------------------------
+------ Bài 3 của "Bài thực hành 8" - Nhóm 10: Hiếu, Duy, Khiêm, Tài --------------
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+
+entity file_combine is
+    Port ( 
+        Clk, reset: in std_logic;
+        button: in std_logic;
+        RS232_A9: in std_logic;
+        RS232_D10: out std_logic;
+        data_in: in std_logic_vector(7 downto 0);
+        CAT: out std_logic;
+        led: out std_logic_vector(6 downto 0)
+        );
+end file_combine;
+
+architecture Behavioral of file_combine is
+    signal button_out: std_logic;
+    signal tmp_done: std_logic;
+begin
+    A0: entity work.debounce
+    port map(
+        clk => clk,
+        button_in => button,
+        button_out => button_out,
+        reset => reset
+    );
+    
+    A1: entity work.combine
+    port map(
+        Clk100M => clk,
+        RX => RS232_A9,
+        reset => reset,
+        led => led,
+        CAT => CAT,
+        done => tmp_done
+    );
+    
+    A2: entity work.tx_UART
+    port map(
+        clk => clk,
+        rst => reset,
+        tx_data_in => data_in,
+        tx_data_out => RS232_D10,
+        done => tmp_done,
+        tx_start => button_out
+    );
+end Behavioral;
+
+----------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+
+
+
+entity debounce is
+    generic (
+            COUNTER_SIZE : integer := 10_000
+            );
+    port ( clk        : in  std_logic;
+           reset      : in  std_logic;
+           button_in  : in  std_logic;
+           button_out : out std_logic);
+end debounce;
+
+
+
+architecture Behavioral of debounce is
+
+    signal flipflop_1       : std_logic := '0';     -- output of flip-flop 1
+    signal flipflop_2       : std_logic := '0';     -- output of flip-flop 2
+    signal flipflop_3       : std_logic := '0';     -- output of flip-flop 3
+    signal flipflop_4       : std_logic := '0';     -- output of flip-flop 4
+    signal count_start      : std_logic := '0';
+
+begin
+
+-- The input_flipflops process creates two serial flip-flops (flip-flop 1 and
+-- flip-flop 2). The signal from button_in passes them one by one. If flip_flop_1
+-- and flip_flop_2 are different, it means the button has been activated, and
+-- count_start becomes '1' for one master clock cycle.
+
+    input_flipflops: process(clk)
+    begin
+        if rising_edge(clk) then
+            if (reset = '0') then
+                flipflop_1 <= '0';
+                flipflop_2 <= '0';
+            else
+                flipflop_1 <= button_in;
+                flipflop_2 <= flipflop_1;
+            end if;
+        end if;
+    end process input_flipflops;
+
+
+-- The count_start signal triggers the pause_counter process to start counting
+
+    count_start <= flipflop_1 xor flipflop_2;
+
+
+-- The pause_counter process passes the button_in signal farther from flip-flop 2
+-- to flip-flop 3, but after COUNTER_SIZE master clock cycles. This allows
+-- the button_in signal to stabilize in a certain state before being passed to the output.
+
+    pause_counter: process(clk)
+        variable count: integer range 0 to COUNTER_SIZE := 0;
+    begin
+        if rising_edge(clk) then
+            if (reset = '0') then
+                count := 0;
+                flipflop_3 <= '0';
+            else
+                if (count_start = '1') then
+                    count := 0;
+                elsif (count < COUNTER_SIZE) then
+                    count := count + 1;
+                else
+                    flipflop_3 <= flipflop_2;
+                end if;
+            end if;
+        end if;
+    end process pause_counter;
+
+
+-- the purpose of the output_flipflop process is creating another flip-flop (flip-flop 4),
+-- which creates a delay between the flipflop_3 and flipflop_4 signals. The delay is
+-- one master clock cycle long.
+
+    output_flipflop: process(clk)
+    begin
+        if rising_edge(clk) then
+            if (reset = '0') then
+                flipflop_4 <= '0';
+            else
+                flipflop_4 <= flipflop_3;
+            end if;
+        end if;
+    end process output_flipflop;
+
+
+-- The delay is needed to create one short (one master clock cycle long) impuls
+-- at the button_out output. When pause_counter has finished, the flipflop_3 signal gets
+-- the button_in information. At the moment flipflop_4 hasn't changed yet.
+-- This creates '1' at the button_out output for one master clock cycle, only if
+-- flipflop_3 is '1' (The button has been pressed, not released).
+
+    with flipflop_3 select
+    button_out <= flipflop_3 xor flipflop_4 when '1',
+                  '0'                       when others;
+
+
+end Behavioral;
+
+----------------------------------------------------------------------------------
+-------------------------------- ADD combine-------------------------------------- 
+----------------------------------------------------------------------------------
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity tx_UART is
+    Port (
+        clk, rst, tx_start: in std_logic;
+        tx_data_in: in std_logic_vector (7 downto 0 ) ;
+        done: in std_logic;
+        tx_data_out: out std_logic
+     );
+end tx_UART;
+
+architecture Behavioral of tx_UART is
+    type ST is ( IDLE, START, DATA, STOP );
+    signal current_state :ST := IDLE;
+    signal data_stored: std_logic_vector ( 7 downto 0 ):=(others => '0');
+    signal tx_enable, start_rst: std_logic := '0';
+    signal baud_clk: std_logic:= '0';
+    signal data_counter: integer range 0 to 7:=0;
+    signal rst_counter: std_logic := '1';
+  
+begin
+frequency_divider: process
+      variable UART_clk : integer range 0 to 10417 := 0 ;   --10417
+begin
+    WAIT UNTIL RISING_EDGE(CLK);
+    if( rst = '0') then
+        baud_clk <= '0';
+        UART_clk := 0;
+    else
+        if( UART_clk = 10417 ) then 
+            baud_clk <= not baud_clk;
+            UART_clk := 0;
+        else
+            UART_clk := UART_clk + 1;
+            baud_clk <= '0';
+        end if;
+    end if;
+end process;
+    
+    --div <= baud_clk;
+
+Data_store_block: process(clk)
+begin
+    if( rising_edge (clk) ) then
+        if( rst = '0') or (start_rst = '1' ) then
+            tx_enable <= '0';
+        else
+            if( tx_start = '1' and tx_enable = '0' and done = '1') then
+                tx_enable <= '1';
+                data_stored <= tx_data_in;
+            end if;
+       end if;
+    end if;
+end process;
+
+data_counter_block: process(clk, baud_clk)
+begin
+    if(rising_edge(clk))then
+        if(rst = '0') or (rst_counter = '1') then
+            data_counter <= 0;
+        elsif( baud_clk = '1' ) then
+            data_counter <= data_counter + 1;
+        end if;
+    end if;
+end process;
+
+FSM_UART: process(clk)
+begin
+if( rising_edge(clk)) then
+    if( rst = '0' ) then
+        current_state <= IDLE;
+        rst_counter <= '1';
+        start_rst <= '1';
+        tx_data_out <= '1';
+    else
+        if(baud_clk = '1') then
+            case current_state is
+                when IDLE =>
+                    rst_counter <= '1';
+                    --tx_enable <= '1';
+                    start_rst <= '0';
+                    tx_data_out <= '1';
+                    if( tx_enable = '1' ) then
+                        current_state <= START;
+                    end if;
+                when START =>
+                    rst_counter <= '0';
+                    tx_data_out <= '0';
+                    current_state <= DATA;
+                when DATA =>
+                    tx_data_out <= data_stored( data_counter );
+                    if( data_counter = 7 ) then
+                        rst_counter <= '1';
+                        current_state <= STOP;
+                    end if;
+                when STOP =>
+                    tx_data_out <= '1';
+                    start_rst <= '1';
+                    current_state <= IDLE;
+                when others => 
+                    current_state <= IDLE;
+            end case;
+end if;
+    end if;
+        end if;
+end process;
+end Behavioral;
